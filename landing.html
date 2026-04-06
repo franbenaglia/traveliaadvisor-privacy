@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel IA Advisor</title>
+  <meta name="description" content="Descubrí lugares increíbles cerca tuyo con inteligencia artificial. Museos, restaurantes, parques y más — en cualquier ciudad del mundo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #6c47ff;
+      --primary-dark: #4f2fe0;
+      --accent: #00d4aa;
+      --text: #1a1a2e;
+      --text-secondary: #555577;
+      --surface: #f7f7ff;
+      --white: #ffffff;
+      --border: #e0e0f0;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(108,71,255,0.10);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 64px;
+    }
+    .nav-logo { font-weight: 800; font-size: 1.15rem; color: var(--primary); letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--accent); }
+    .lang-toggle {
+      display: flex; gap: 4px;
+      background: var(--surface); border-radius: 24px; padding: 4px;
+    }
+    .lang-btn {
+      border: none; background: none; padding: 4px 14px; border-radius: 20px;
+      font-size: 0.82rem; font-weight: 600; cursor: pointer; color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .lang-btn.active { background: var(--primary); color: var(--white); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 50%, #1a3a5c 100%);
+      color: var(--white);
+      padding: 80px 5% 100px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(108,71,255,0.3) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0,212,170,0.15);
+      border: 1px solid rgba(0,212,170,0.4);
+      color: var(--accent);
+      padding: 6px 18px; border-radius: 24px;
+      font-size: 0.82rem; font-weight: 600; margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800; line-height: 1.15;
+      margin-bottom: 20px; position: relative;
+    }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: rgba(255,255,255,0.78);
+      max-width: 560px; margin: 0 auto 40px; position: relative;
+    }
+    .play-badge {
+      display: inline-block;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .play-badge:hover { transform: scale(1.04); opacity: 0.9; }
+    .play-badge img { height: 60px; }
+
+    /* ── SECTION ── */
+    section { padding: 80px 5%; }
+    .section-label {
+      display: inline-block;
+      background: rgba(108,71,255,0.08);
+      color: var(--primary);
+      padding: 5px 16px; border-radius: 20px;
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 16px;
+    }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin-bottom: 12px; }
+    .subtitle { font-size: 1.05rem; color: var(--text-secondary); max-width: 520px; margin: 0 auto 56px; }
+    .text-center { text-align: center; }
+
+    /* ── FEATURES ── */
+    .features-bg { background: var(--surface); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px; max-width: 1100px; margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(108,71,255,0.15); }
+    .feature-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 20px;
+    }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px; max-width: 900px; margin: 0 auto;
+    }
+    .pricing-card {
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    .pricing-card:hover { transform: translateY(-4px); }
+    .pricing-card.featured {
+      border-color: var(--primary);
+      background: linear-gradient(160deg, #f3f0ff 0%, #ffffff 100%);
+      box-shadow: 0 8px 40px rgba(108,71,255,0.18);
+    }
+    .pricing-badge {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      padding: 4px 20px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+    }
+    .pricing-card h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
+    .pricing-price {
+      font-size: 2.4rem; font-weight: 800; color: var(--primary); line-height: 1;
+      margin: 16px 0 6px;
+    }
+    .pricing-price span { font-size: 1rem; font-weight: 500; color: var(--text-secondary); }
+    .pricing-desc { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 24px; }
+    .pricing-list { list-style: none; }
+    .pricing-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.92rem; padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-list li:last-child { border-bottom: none; }
+    .pricing-list li::before { content: '✓'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    .pricing-list li.limited::before { content: '◌'; color: var(--text-secondary); }
+    .pricing-note {
+      margin-top: 24px;
+      background: rgba(108,71,255,0.06);
+      border-radius: 10px; padding: 14px 16px;
+      font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps { background: var(--surface); }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px; max-width: 900px; margin: 0 auto;
+      counter-reset: steps;
+    }
+    .step { text-align: center; }
+    .step-num {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 800; color: var(--white);
+      margin: 0 auto 16px;
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 0.88rem; color: var(--text-secondary); }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 100%);
+      color: var(--white); text-align: center;
+    }
+    .cta-section h2 { color: var(--white); }
+    .cta-section .subtitle { color: rgba(255,255,255,0.7); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--text);
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 32px 5%;
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 0 4%; }
+      section { padding: 60px 4%; }
+      .hero { padding: 60px 4% 80px; }
+    }
+
+    /* ── LANG TOGGLE ── */
+    [data-lang] { display: none; }
+    [data-lang].visible { display: block; }
+    [data-lang-inline] { display: none; }
+    [data-lang-inline].visible { display: inline; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Travel <span>IA</span> Advisor</div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('es')">ES</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- ES -->
+  <div data-lang="es">
+    <div class="hero-badge">🗺️ Disponible en Google Play</div>
+    <h1>Tu guía de viaje con <em>inteligencia artificial</em></h1>
+    <p>Descubrí museos, restaurantes, parques y lugares únicos cerca tuyo — en cualquier ciudad del mundo.</p>
+  </div>
+  <!-- EN -->
+  <div data-lang="en">
+    <div class="hero-badge">🗺️ Available on Google Play</div>
+    <h1>Your travel guide powered by <em>artificial intelligence</em></h1>
+    <p>Discover museums, restaurants, parks and unique places near you — in any city in the world.</p>
+  </div>
+  <a class="play-badge" href="https://play.google.com/store/apps/details?id=com.traveliaadvisor.app" target="_blank" rel="noopener">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" />
+  </a>
+</section>
+
+<!-- FEATURES -->
+<section class="features-bg">
+  <div class="text-center">
+    <span class="section-label" data-lang-inline="es">Funcionalidades</span>
+    <span class="section-label" data-lang-inline="en">Features</span>
+    <h2 data-lang="es">Todo lo que necesitás para explorar</h2>
+    <h2 data-lang="en">Everything you need to explore</h2>
+    <p class="subtitle" data-lang="es">Una app completa para descubrir el mundo a tu ritmo.</p>
+    <p class="subtitle" data-lang="en">A complete app to discover the world at your own pace.</p>
+  </div>
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <div class="feature-icon">📍</div>
+      <h3 data-lang="es">Mapa interactivo de POIs</h3>
+      <h3 data-lang="en">Interactive POI map</h3>
+      <p data-lang="es">Explorá museos, restaurantes, parques, monumentos y más en un mapa en tiempo real. Filtrá por categoría y encontrá lo que buscás al instante.</p>
+      <p data-lang="en">Explore museums, restaurants, parks, monuments and more on a real-time map. Filter by category and find what you're looking for instantly.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3 data-lang="es">Asistente IA de viajes</h3>
+      <h3 data-lang="en">AI travel assistant</h3>
+      <p data-lang="es">Preguntale al chat de inteligencia artificial sobre los lugares cercanos. Recomendaciones personalizadas basadas en tu ubicación actual.</p>
+      <p data-lang="en">Ask the AI chat about nearby places. Personalized recommendations based on your current location.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">📸</div>
+      <h3 data-lang="es">Fotos geoposicionadas</h3>
+      <h3 data-lang="en">Geolocated photos</h3>
+      <p data-lang="es">Tomá fotos que se guardan automáticamente con su ubicación exacta en el mapa. Tu galería de recuerdos de viaje, siempre organizada.</p>
+      <p data-lang="en">Take photos that are automatically saved with their exact location on the map. Your travel memory gallery, always organized.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">❤️</div>
+      <h3 data-lang="es">Favoritos</h3>
+      <h3 data-lang="en">Favorites</h3>
+      <p data-lang="es">Guardá los lugares que más te gustan y accedé a ellos rápidamente. Creá tu propia lista de imperdibles para cada destino.</p>
+      <p data-lang="en">Save your favorite places and access them quickly. Create your own must-see list for each destination.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🌍</div>
+      <h3 data-lang="es">Cualquier ciudad del mundo</h3>
+      <h3 data-lang="en">Any city in the world</h3>
+      <p data-lang="es">Movete en el mapa y la app se adapta automáticamente. Buenos Aires, Madrid, Roma, Tokio — donde estés, Travel IA Advisor te acompaña.</p>
+      <p data-lang="en">Move the map and the app adapts automatically. Buenos Aires, Madrid, Rome, Tokyo — wherever you are, Travel IA Advisor is with you.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <h3 data-lang="es">Cuenta segura</h3>
+      <h3 data-lang="en">Secure account</h3>
+      <p data-lang="es">Registrate con email o Google. Tu información y favoritos sincronizados de forma segura. Podés usar la app sin cuenta con funciones básicas.</p>
+      <p data-lang="en">Sign up with email or Google. Your information and favorites securely synced. You can use the app without an account with basic features.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="steps">
+  <div class="text-center">
+    <span class="section-label" data-lang-inline="es">Cómo funciona</span>
+    <span class="section-label" data-lang-inline="en">How it works</span>
+    <h2 data-lang="es">Simple y fácil de usar</h2>
+    <h2 data-lang="en">Simple and easy to use</h2>
+    <p class="subtitle" data-lang="es">En tres pasos tenés toda la información que necesitás.</p>
+    <p class="subtitle" data-lang="en">In three steps you have all the information you need.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3 data-lang="es">Abrí la app</h3>
+      <h3 data-lang="en">Open the app</h3>
+      <p data-lang="es">El mapa se posiciona automáticamente en tu ubicación actual con GPS.</p>
+      <p data-lang="en">The map automatically positions to your current GPS location.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3 data-lang="es">Explorá el mapa</h3>
+      <h3 data-lang="en">Explore the map</h3>
+      <p data-lang="es">Ves los lugares de interés cercanos en tiempo real. Filtrá por categoría.</p>
+      <p data-lang="en">See nearby points of interest in real time. Filter by category.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3 data-lang="es">Preguntale a la IA</h3>
+      <h3 data-lang="en">Ask the AI</h3>
+      <p data-lang="es">Usá el chat para pedir recomendaciones específicas sobre la zona.</p>
+      <p data-lang="en">Use the chat to ask for specific recommendations about the area.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3 data-lang="es">Guardá y fotografiá</h3>
+      <h3 data-lang="en">Save and photograph</h3>
+      <p data-lang="es">Marcá favoritos y tomá fotos geoposicionadas de tus lugares preferidos.</p>
+      <p data-lang="en">Mark favorites and take geolocated photos of your favorite places.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section>
+  <div class="text-center">
+    <span class="section-label" data-lang-inline="es">Planes</span>
+    <span class="section-label" data-lang-inline="en">Plans</span>
+    <h2 data-lang="es">Gratis para empezar, Premium para más</h2>
+    <h2 data-lang="en">Free to start, Premium for more</h2>
+    <p class="subtitle" data-lang="es">Usá Travel IA Advisor sin costo. Actualizá cuando quieras más.</p>
+    <p class="subtitle" data-lang="en">Use Travel IA Advisor at no cost. Upgrade whenever you want more.</p>
+  </div>
+  <div class="pricing-grid">
+
+    <!-- FREE -->
+    <div class="pricing-card">
+      <h3 data-lang="es">Gratis</h3>
+      <h3 data-lang="en">Free</h3>
+      <div class="pricing-price">$0 <span data-lang="es">/siempre</span><span data-lang="en">/forever</span></div>
+      <p class="pricing-desc" data-lang="es">Sin tarjeta de crédito. Sin límite de tiempo.</p>
+      <p class="pricing-desc" data-lang="en">No credit card. No time limit.</p>
+      <ul class="pricing-list">
+        <li data-lang="es">Mapa interactivo de lugares</li>
+        <li data-lang="en">Interactive places map</li>
+        <li data-lang="es">Filtros por categoría</li>
+        <li data-lang="en">Category filters</li>
+        <li data-lang="es">Fotos geoposicionadas</li>
+        <li data-lang="en">Geolocated photos</li>
+        <li class="limited" data-lang="es">Chat IA — 5 preguntas/día</li>
+        <li class="limited" data-lang="en">AI chat — 5 questions/day</li>
+        <li class="limited" data-lang="es">Búsquedas de lugares limitadas</li>
+        <li class="limited" data-lang="en">Limited place searches</li>
+        <li class="limited" data-lang="es">Favoritos básicos</li>
+        <li class="limited" data-lang="en">Basic favorites</li>
+      </ul>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="pricing-card featured">
+      <div class="pricing-badge" data-lang="es">⭐ Más popular</div>
+      <div class="pricing-badge" data-lang="en">⭐ Most popular</div>
+      <h3 data-lang="es">Premium</h3>
+      <h3 data-lang="en">Premium</h3>
+      <div class="pricing-price">$2.99 <span data-lang="es">/mes</span><span data-lang="en">/month</span></div>
+      <p class="pricing-desc" data-lang="es">También disponible plan anual y pago único de por vida.</p>
+      <p class="pricing-desc" data-lang="en">Also available: yearly plan and one-time lifetime purchase.</p>
+      <ul class="pricing-list">
+        <li data-lang="es">Todo lo del plan Gratis</li>
+        <li data-lang="en">Everything in Free</li>
+        <li data-lang="es">Chat IA ilimitado</li>
+        <li data-lang="en">Unlimited AI chat</li>
+        <li data-lang="es">Búsquedas de lugares ilimitadas</li>
+        <li data-lang="en">Unlimited place searches</li>
+        <li data-lang="es">Favoritos ilimitados</li>
+        <li data-lang="en">Unlimited favorites</li>
+        <li data-lang="es">Sin publicidad</li>
+        <li data-lang="en">No ads</li>
+        <li data-lang="es">Soporte prioritario</li>
+        <li data-lang="en">Priority support</li>
+      </ul>
+      <div class="pricing-note" data-lang="es">
+        Las compras se gestionan de forma segura a través de <strong>Google Play</strong>. Podés cancelar en cualquier momento desde tu cuenta de Google Play. Para solicitar un reembolso, contactanos en <a href="mailto:traveliaadv@gmail.com">traveliaadv@gmail.com</a>.
+      </div>
+      <div class="pricing-note" data-lang="en">
+        Purchases are securely managed through <strong>Google Play</strong>. You can cancel anytime from your Google Play account. To request a refund, contact us at <a href="mailto:traveliaadv@gmail.com">traveliaadv@gmail.com</a>.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div data-lang="es">
+    <span class="section-label" style="background:rgba(0,212,170,0.15);color:var(--accent);">Descargá ahora</span>
+    <h2>Empezá a explorar el mundo hoy</h2>
+    <p class="subtitle">Gratis. Sin registro obligatorio. Para Android.</p>
+  </div>
+  <div data-lang="en">
+    <span class="section-label" style="background:rgba(0,212,170,0.15);color:var(--accent);">Download now</span>
+    <h2>Start exploring the world today</h2>
+    <p class="subtitle">Free. No mandatory sign-up. For Android.</p>
+  </div>
+  <a class="play-badge" href="https://play.google.com/store/apps/details?id=com.traveliaadvisor.app" target="_blank" rel="noopener">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" />
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="mailto:traveliaadv@gmail.com">traveliaadv@gmail.com</a>
+    <a href="privacy.html" data-lang="es">Política de Privacidad</a>
+    <a href="privacy.html" data-lang="en">Privacy Policy</a>
+    <a href="privacy.html" data-lang="es">Términos de Uso</a>
+    <a href="privacy.html" data-lang="en">Terms of Use</a>
+  </div>
+  <p>© 2026 Travel IA Advisor.
+    <span data-lang="es">Hecho con ❤️ para exploradores.</span>
+    <span data-lang="en">Made with ❤️ for explorers.</span>
+  </p>
+  <p style="margin-top:8px;font-size:0.75rem;opacity:0.5">
+    Google Play and the Google Play logo are trademarks of Google LLC.
+  </p>
+</footer>
+
+<script>
+  function setLang(lang) {
+    document.documentElement.lang = lang;
+
+    // block elements
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      el.classList.toggle('visible', el.dataset.lang === lang);
+    });
+
+    // inline elements
+    document.querySelectorAll('[data-lang-inline]').forEach(el => {
+      el.classList.toggle('visible', el.dataset.langInline === lang);
+    });
+
+    // buttons
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
+    });
+
+    localStorage.setItem('tia-lang', lang);
+  }
+
+  // Init
+  const saved = localStorage.getItem('tia-lang') ||
+    (navigator.language.startsWith('es') ? 'es' : 'en');
+  setLang(saved);
+</script>
+</body>
+</html>
